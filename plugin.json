@@ -1,0 +1,13 @@
+{
+  "name": "cw-ring-personalize-no-setting-test",
+  "description": "cw-ring-personalize-no-setting-test",
+  "version": "1.0.0",
+  "plugin_ver": 1,
+  "author": "mliucc",
+  "settings": false,
+
+  "url": "https://github.com/RinLit-233-shiroko/cw-example-plugin",
+  "branch": "main",
+
+  "update_date": "2024/12/6"
+}

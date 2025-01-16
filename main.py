@@ -1,4 +1,4 @@
-#高级铃声无设置版测试
+#高级铃声插件v1.0.1
 
 from PyQt5 import uic
 from loguru import logger

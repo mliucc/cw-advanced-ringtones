@@ -1,4 +1,4 @@
-# Class Widgets 铃声自定义
+# Class Widgets 高级铃声
 **插件正在开发中，请等待后续开发完成后上架插件广场！**
 ## 简介
 cw-advanced-ringtones，一个可以为Class Widgets提供**高级铃声**的插件

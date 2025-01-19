@@ -1,13 +1,13 @@
 {
-  "name": "cw-ring-personalize-no-setting-test",
-  "description": "cw-ring-personalize-no-setting-test",
-  "version": "1.0.0",
+  "name": "cw-ring-personality",
+  "description": "一个为Class Widgets提供高级铃声的插件",
+  "version": "1.1.0",
   "plugin_ver": 1,
   "author": "mliucc",
   "settings": false,
 
-  "url": "https://github.com/RinLit-233-shiroko/cw-example-plugin",
+  "url": "https://github.com/mliucc/cw-ring-personality",
   "branch": "main",
 
-  "update_date": "2024/12/6"
+  "update_date": "2025/1/19"
 }

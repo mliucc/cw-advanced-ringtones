@@ -1,7 +1,6 @@
-#高级铃声插件v1.0.1
+#高级铃声插件v1.1.0
 
 #待实现功能：
-#config.json存储铃声配置
 #QtDesigner 设置UI
 #自定义其他铃声
 
@@ -21,32 +20,54 @@ from conf import base_directory
 class Plugin(PluginBase):  # 插件类
     def __init__(self, cw_contexts, method):  # 初始化
         super().__init__(cw_contexts, method)  # 调用父类初始化方法
-        global playsound,prepare_class,attend_class,finish_class,noon,finish_school,default,noon_type,noon_class,vol
-
-        #铃声文件名(请在config.ini内配置)
-        prepare_class = conf.read_conf('File','prepare_class')
-        attend_class = conf.read_conf('File','attend_class')
-        finish_class = conf.read_conf('File','finish_class')
-        noon = conf.read_conf('File','noon')
-        finish_school = conf.read_conf('File','finish_school')
-        default = conf.read_conf('File','default')
-        print(attend_class)
-        #配置铃声区域(请在config.ini内配置)
-        noon_type = conf.read_conf('Noon','noon_type')       #午餐铃或午自习铃对应通知类型（见config.ini）
-        noon_class = conf.read_conf('Noon','noon_class')      #午餐铃或午自习铃对应课程(见config.ini)
-        vol = ('Volume','volume')    #铃声音量（见config.ini)
-        #配置铃声区域(请在config.ini内配置)
+        global playsound,prepare_class,attend_class,finish_class,attend_school,noon,finish_school,default,noon_type,noon_class,attend_school_type,attend_school_class,vol
+        #json配置文件装载
+        default_config = {
+            "version": "1.0.2",
+            "volume": "75",
+            "noon_cfg": {
+                "noon_type": "1",
+                "noon_class": "午自习"
+            },
+            "attend_school_cfg": {
+                "attend_school_type": "1",
+                "attend_school_class": "进班"
+            },
+            "file": {
+                "prepare_class": "prepare_class.wav",
+                "attend_class": "attend_class.wav",
+                "finish_class": "finish_class.wav",
+                "attend_school": "attend_school.wav",
+                "noon": "noon.wav",
+                "finish_school": "finish_school.wav",
+                "default": "default.wav"
+            }
+        }
+        self.cfg = PluginConfig(self.PATH, 'config.json')  # 实例化配置类
+        self.cfg.load_config(default_config)  # 加载配置
+        #铃声文件(请在config.json内配置)
+        prepare_class = self.cfg['file']['prepare_class']
+        attend_class = self.cfg['file']['attend_class']
+        finish_class = self.cfg['file']['finish_class']
+        attend_school = self.cfg['file']['attend_school']
+        noon = self.cfg['file']['noon']
+        finish_school = self.cfg['file']['finish_school']
+        default = self.cfg['file']['default']
+        #配置铃声区域(请在config.json内配置)
+        noon_type = int(self.cfg['noon_cfg']['noon_type'])       #午休铃对应通知类型
+        noon_class = self.cfg['noon_cfg']['noon_class']      #午休铃对应课程
+        attend_school_type = int(self.cfg['attend_school_cfg']['attend_school_type'])       #早读铃对应通知类型
+        attend_school_class = self.cfg['attend_school_cfg']['attend_school_class']      #早读铃对应课程
+        vol = int(self.cfg['volume'])    #铃声音量
 
 
     def execute(self):  # 自启动执行部分
-        global playsound
-        
+        global playsound 
         #播放铃声
         pygame.mixer.init()
         def playsound(filename):
             try:
-                print(base_directory)
-                file_path = os.path.join(base_directory, 'plugins', 'cw-ring-personality', 'plugin_audio', filename)
+                file_path = os.path.join(self.PATH, 'plugin_audio', filename)
                 pygame.mixer.music.load(file_path)
                 volume = vol / 100
                 pygame.mixer.music.set_volume(volume)
@@ -56,6 +77,7 @@ class Plugin(PluginBase):  # 插件类
 
     def update(self, cw_contexts):  # 自动更新部分
         super().update(cw_contexts)  # 调用父类更新方法
+        self.cfg.update_config()  # 更新配置
         #判定主程序是否发送通知
         if self.method.is_get_notification():
             if self.cw_contexts['Notification']['state'] == 2:    #判定放学
@@ -64,6 +86,12 @@ class Plugin(PluginBase):  # 插件类
                     logger.info('插件cw-ring-personality播放铃声：放学')
                 except Exception as e:
                     logger.error(f'插件cw-ring-personality播放 放学 铃声出错：{e}')
+            elif self.cw_contexts['Notification']['state'] == attend_school_type and self.cw_contexts['Notification']['lesson_name'] == attend_school_class:    #判定早读
+                try:
+                    playsound(attend_school)
+                    logger.info('插件cw-ring-personality播放铃声：进班')
+                except Exception as e:
+                    logger.error(f'插件cw-ring-personality播放 进班 铃声出错：{e}')
             elif self.cw_contexts['Notification']['state'] == noon_type and self.cw_contexts['Notification']['lesson_name'] == noon_class:    #判定午休
                 try:
                     playsound(noon)
@@ -92,7 +120,7 @@ class Plugin(PluginBase):  # 插件类
                 elif self.cw_contexts['Notification']['state'] == 4:    #判定其他通知
                     try:
                         playsound(default)
-                        logger.infof('插件cw-ring-personality检测到其他通知，将使用默认铃声')
+                        logger.info('插件cw-ring-personality检测到其他通知，将使用默认铃声')
                     except Exception as e:
                         logger.error(f'插件cw-ring-personality检测到 其他 通知，播放 默认 铃声出错：{e}')
                 else:

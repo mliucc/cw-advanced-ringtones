@@ -1,7 +1,7 @@
 {
-  "name": "cw-ring-personality",
+  "name": "高级自定义铃声",
   "description": "一个为Class Widgets提供高级铃声的插件",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "plugin_ver": 1,
   "author": "mliucc",
   "settings": false,

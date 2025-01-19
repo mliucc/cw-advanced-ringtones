@@ -73,7 +73,7 @@ class Plugin(PluginBase):  # 插件类
                 pygame.mixer.music.set_volume(volume)
                 pygame.mixer.music.play()
             except Exception as e:
-                logger.error(f'插件cw-ring-personality读取音频文件出错：{e}')
+                logger.error(f'插件cw-advanced-ringtones读取音频文件出错：{e}')
 
     def update(self, cw_contexts):  # 自动更新部分
         super().update(cw_contexts)  # 调用父类更新方法
@@ -83,47 +83,47 @@ class Plugin(PluginBase):  # 插件类
             if self.cw_contexts['Notification']['state'] == 2:    #判定放学
                 try:
                     playsound(finish_school)
-                    logger.info('插件cw-ring-personality播放铃声：放学')
+                    logger.info('插件cw-advanced-ringtones播放铃声：放学')
                 except Exception as e:
-                    logger.error(f'插件cw-ring-personality播放 放学 铃声出错：{e}')
+                    logger.error(f'插件cw-advanced-ringtones播放 放学 铃声出错：{e}')
             elif self.cw_contexts['Notification']['state'] == attend_school_type and self.cw_contexts['Notification']['lesson_name'] == attend_school_class:    #判定早读
                 try:
                     playsound(attend_school)
-                    logger.info('插件cw-ring-personality播放铃声：进班')
+                    logger.info('插件cw-advanced-ringtones播放铃声：早读')
                 except Exception as e:
-                    logger.error(f'插件cw-ring-personality播放 进班 铃声出错：{e}')
+                    logger.error(f'插件cw-advanced-ringtones播放 早读 铃声出错：{e}')
             elif self.cw_contexts['Notification']['state'] == noon_type and self.cw_contexts['Notification']['lesson_name'] == noon_class:    #判定午休
                 try:
                     playsound(noon)
-                    logger.info('插件cw-ring-personality播放铃声：午休')
+                    logger.info('插件cw-advanced-ringtones播放铃声：午休')
                 except Exception as e:
-                    logger.error(f'插件cw-ring-personality播放 午休 铃声出错：{e}')
+                    logger.error(f'插件cw-advanced-ringtones播放 午休 铃声出错：{e}')
             else:    #判定普通铃声
                 if self.cw_contexts['Notification']['state'] == 0:    #判定下课
                     try:
                         playsound(finish_class)
-                        logger.info('插件cw-ring-personality播放铃声：下课')
+                        logger.info('插件cw-advanced-ringtones播放铃声：下课')
                     except Exception as e:
-                        logger.error(f'插件cw-ring-personality播放 下课 铃声出错：{e}')
+                        logger.error(f'插件cw-advanced-ringtones播放 下课 铃声出错：{e}')
                 elif self.cw_contexts['Notification']['state'] == 1:    #判定上课
                     try:
                         playsound(attend_class)
-                        logger.info('插件cw-ring-personality播放铃声：上课')
+                        logger.info('插件cw-advanced-ringtones播放铃声：上课')
                     except Exception as e:
-                        logger.error(f'插件cw-ring-personality播放 上课 铃声出错：{e}')
+                        logger.error(f'插件cw-advanced-ringtones播放 上课 铃声出错：{e}')
                 elif self.cw_contexts['Notification']['state'] == 3:    #判定预备
                     try:
                         playsound(prepare_class)
-                        logger.info('插件cw-ring-personality播放铃声：准备上课')
+                        logger.info('插件cw-advanced-ringtones播放铃声：准备上课')
                     except Exception as e:
-                        logger.error(f'插件cw-ring-personality播放 预备 铃声出错：{e}')
+                        logger.error(f'插件cw-advanced-ringtones播放 预备 铃声出错：{e}')
                 elif self.cw_contexts['Notification']['state'] == 4:    #判定其他通知
                     try:
                         playsound(default)
-                        logger.info('插件cw-ring-personality检测到其他通知，将使用默认铃声')
+                        logger.info('插件cw-advanced-ringtones检测到其他通知，将使用默认铃声')
                     except Exception as e:
-                        logger.error(f'插件cw-ring-personality检测到 其他 通知，播放 默认 铃声出错：{e}')
+                        logger.error(f'插件cw-advanced-ringtones检测到 其他 通知，播放 默认 铃声出错：{e}')
                 else:
-                    logger.info('插件cw-ring-personality检测到未知通知，将不播放铃声，请检查主程序的日志以排查问题')
+                    logger.info('插件cw-advanced-ringtones检测到未知通知，将不播放铃声，请检查主程序的日志以排查问题')
                     
 

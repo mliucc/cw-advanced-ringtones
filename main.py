@@ -1,8 +1,4 @@
-#高级铃声插件v1.1.0
-
-#待实现功能：
-#QtDesigner 设置UI
-#自定义其他铃声
+#高级铃声插件v1.1.1
 
 from PyQt5 import uic
 from loguru import logger
@@ -23,7 +19,7 @@ class Plugin(PluginBase):  # 插件类
         global playsound,prepare_class,attend_class,finish_class,attend_school,noon,finish_school,default,noon_type,noon_class,attend_school_type,attend_school_class,vol
         #json配置文件装载
         default_config = {
-            "version": "1.0.2",
+            "version": "1.1.1",
             "volume": "75",
             "noon_cfg": {
                 "noon_type": "1",

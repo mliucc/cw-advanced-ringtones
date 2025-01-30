@@ -17,7 +17,7 @@ class Plugin(PluginBase):  # 插件类
         super().__init__(cw_contexts, method)  # 调用父类初始化方法
         #json配置文件装载
         default_config = {
-            "version": "1.1.1",
+            "version": "1.1.2",
             "volume": "75",
             "noon_cfg": {
                 "noon_type": "1",
@@ -57,12 +57,10 @@ class Plugin(PluginBase):  # 插件类
         self.cfg = PluginConfig(self.PATH, 'config.json')  # 实例化配置类
         self.cfg.load_config(default_config)  # 加载配置
         
-        
-
     def execute(self):  # 自启动执行部分
         conf.write_conf('Audio', 'volume',0) #设置主程序通知音量为0
         global playsound,prepare_class,attend_class,finish_class,attend_school,noon,finish_school,default,noon_type,noon_class,attend_school_type,attend_school_class,vol,extring_file,extring_cfg
-        
+
         #预设铃声文件读取
         prepare_class = self.cfg['file']['prepare_class']
         attend_class = self.cfg['file']['attend_class']
@@ -71,17 +69,18 @@ class Plugin(PluginBase):  # 插件类
         noon = self.cfg['file']['noon']
         finish_school = self.cfg['file']['finish_school']
         default = self.cfg['file']['default']
+
         #自定义铃声文件读取
-        logger.info('高级铃声插件提示：当前共启用' + self.cfg['extra_ringtones']['ringtone_quanlity'] + '个自定义铃声，请确认该数量与实际启用自定义铃声数量（即config.json中extra_ringtones中ringtone_quanlity数字与各ringtone_cfg中ringtone_switch值为1的数量）一致')
         extring_file = {}
         extring_cfg = {}
-        for i in range(int(self.cfg['extra_ringtones']['ringtone_quanlity'])):
-            i = i + 1
-            extring_filename = f'extring_{i}'
-            extring_type = f'extring{i}_type'
-            extring_class = f'extring{i}_class'
-            #判定铃声是否启用，若启用则加载文件与配置
-            exec(f'''
+        if int(self.cfg['extra_ringtones']['ringtone_quanlity']) > 0:
+            for i in range(int(self.cfg['extra_ringtones']['ringtone_quanlity'])):
+                i = i + 1
+                extring_filename = f'extring_{i}'
+                extring_type = f'extring{i}_type'
+                extring_class = f'extring{i}_class'
+                #判定铃声是否启用，若启用则加载文件与配置
+                exec(f'''
 if int(self.cfg['extra_ringtones']['ringtone{i}_cfg']['ringtone{i}_switch']) == 1:
     extring_file[extring_filename] = self.cfg['extra_ringtones']['ringtone_file']['ringtone{i}']
     extring_cfg[extring_type] = int(self.cfg['extra_ringtones']['ringtone{i}_cfg']['ringtone{i}_type'])
@@ -89,7 +88,10 @@ if int(self.cfg['extra_ringtones']['ringtone{i}_cfg']['ringtone{i}_switch']) == 
     logger.success('高级铃声插件提示：自定义铃声{i}已启用')
 else:
     logger.error('高级铃声插件提示：自定义铃声{i}已禁用，请关闭程序后修改config.json中ringtone_quanlity数字与本处提示启用的铃声数量一致！')
-            ''')
+                ''')
+            logger.info('高级铃声插件提示：当前共启用' + self.cfg['extra_ringtones']['ringtone_quanlity'] + '个自定义铃声，请确认该数量与实际启用自定义铃声数量（即config.json中extra_ringtones中ringtone_quanlity数字与各ringtone_cfg中ringtone_switch值为1的数量）一致')
+        elif int(self.cfg['extra_ringtones']['ringtone_quanlity']) == 0:
+            logger.info('高级铃声插件提示：当前未启用自定义铃声')
 
         #预设铃声配置
         noon_type = int(self.cfg['noon_cfg']['noon_type'])       #午休铃对应通知类型
@@ -119,19 +121,20 @@ else:
         if self.method.is_get_notification():
             custom_ringtone_played = False
             i = 1
-            custom_ringtone_played = False
-            while not custom_ringtone_played and i <= int(self.cfg['extra_ringtones']['ringtone_quanlity']):
-                try:
-#自定义铃声
-                    if int(self.cfg['extra_ringtones'][f'ringtone{i}_cfg'][f'ringtone{i}_switch']) == 1 and self.cw_contexts['Notification']['state'] == extring_cfg[f'extring{i}_type'] and self.cw_contexts['Notification']['lesson_name'] == extring_cfg[f'extring{i}_class']:
-                        playsound(extring_file[f'extring_{i}'])
-                        custom_ringtone_played = True
-                        logger.info(f'高级铃声插件播放铃声：自定义铃声{i}')
-                except Exception as e:
-                    logger.error(f'高级铃声插件播放自定义铃声{i}出错：{e}')
-                i = i + 1
+            #自定义铃声
+            if int(self.cfg['extra_ringtones']['ringtone_quanlity']) > 0:    #判定启用自定义铃声
+                while not custom_ringtone_played and i <= int(self.cfg['extra_ringtones']['ringtone_quanlity']):
+                    try:
+                        #播放铃声
+                        if int(self.cfg['extra_ringtones'][f'ringtone{i}_cfg'][f'ringtone{i}_switch']) == 1 and self.cw_contexts['Notification']['state'] == extring_cfg[f'extring{i}_type'] and self.cw_contexts['Notification']['lesson_name'] == extring_cfg[f'extring{i}_class']:
+                            playsound(extring_file[f'extring_{i}'])
+                            custom_ringtone_played = True
+                            logger.info(f'高级铃声插件播放铃声：自定义铃声{i}')
+                    except Exception as e:
+                        logger.error(f'高级铃声插件播放自定义铃声{i}出错：{e}')
+                    i = i + 1
                 
-#预设铃声
+            #预设铃声
             if not custom_ringtone_played:
                 if self.cw_contexts['Notification']['state'] == 2:    #判定放学
                     try:

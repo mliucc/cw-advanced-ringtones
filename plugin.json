@@ -1,7 +1,7 @@
 {
   "name": "高级铃声",
   "description": "一个为Class Widgets提供高级铃声的插件",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "plugin_ver": 1,
   "author": "mliucc",
   "settings": false,
@@ -9,5 +9,5 @@
   "url": "https://github.com/mliucc/cw-advanced-ringtones",
   "branch": "main",
 
-  "update_date": "2025/1/20"
+  "update_date": "2025/1/30"
 }

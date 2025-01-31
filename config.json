@@ -1,0 +1,38 @@
+{
+    "version": "1.1.2",
+    "volume": "75",
+    "noon_cfg": {
+        "noon_type": "1",
+        "noon_class": "午自习"
+    },
+    "attend_school_cfg": {
+        "attend_school_type": "1",
+        "attend_school_class": "进班"
+    },
+    "file": {
+        "prepare_class": "prepare_class.wav",
+        "attend_class": "attend_class.wav",
+        "finish_class": "finish_class.wav",
+        "attend_school": "attend_school.wav",
+        "noon": "noon.wav",
+        "finish_school": "finish_school.wav",
+        "default": "default.wav"
+    },
+    "extra_ringtones": {
+        "ringtone_quanlity": "0",
+        "ringtone_file": {
+            "ringtone1": "ringtone1.wav",
+            "ringtone2": "ringtone2.wav"
+        },
+        "ringtone1_cfg": {
+            "ringtone1_switch": "0",
+            "ringtone1_type": "None",
+            "ringtone1_class": "None"
+        },
+        "ringtone2_cfg": {
+            "ringtone2_switch": "0",
+            "ringtone2_type": "None",
+            "ringtone2_class": "None"
+        }
+    }
+}

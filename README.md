@@ -1,12 +1,12 @@
 # Class Widgets 高级铃声
 > [!WARNING]
-> 1.本插件目前无法检测来自其他插件的通知，如需使用该类型插件，请卸载本插件并调整主程序铃声音量**或使用本插件的通知模块**以解决问题 <br>
+> 1.本插件目前无法检测来自其他插件的通知，如需使用该类型插件，请**使用本插件的通知模块**或卸载本插件并调整主程序铃声音量以解决问题 <br>
 > 2.由于插件迭代需求，更新需要重置配置文件，请在更新前备份config.json，并在更新后修改重命名example.json，后续版本将会解决该问题
 
 > [!IMPORTANT]
 > 由于人手原因及功能复杂度，插件未经过广泛测试，请确保投入使用前使用一套单独的时间线、课程表进行测试，如有问题请及时[提交issue反馈](https://github.com/mliucc/cw-advanced-ringtones/issues)
 ## 简介
-一个可以为Class Widgets提供**高级铃声**的插件
+一个可以为Class Widgets提供**高级铃声与通知**的插件
 ## 计划/已经实现的功能
 - [x] 支持早读铃、上课铃、下课铃、预备铃、午休铃、放学铃
 - [x] 支持自定义铃声配置（测试2个铃声通过，理论支持铃声数量无限)
@@ -30,11 +30,8 @@
    >
    > 早读铃声配置："attend_school_cfg": **与上述午休铃声配置同理**
    >
-   > 自定义铃声配置："extra_ringtones"：
-   > > 启用自定义铃声数量："ringtone_quanlity":***配置启用的铃声数量，≥0的整数，设置为0则禁用自定义铃声，请确认该数量与实际启用自定义铃声数量（即config.json中extra_ringtones中各ringtone_cfg中ringtone_switch值为1的数量）一致***
-   > >
-   > > 自定义铃声配置[^2]："ringtone***序号[^1]***_cfg": **与上述午休铃声配置同理**
-- **配置通知**  进入./plugin/cw-advanced-ringtones目录，打开**config.json的"notifications"**，按照下面提示进行配置： 
+   > 自定义铃声配置[^2]："extra_ringtones"："ringtone***序号[^1]***_cfg": **与上述午休铃声配置同理**
+- **配置通知**  进入./plugin/cw-advanced-ringtones目录，打开**config.json的"notifications"模块**，按照下面提示进行配置： 
    > 通知开关："notification***序号[^1]***_switch": ***0或1, 0为关闭通知，1为开启通知***
    > 
    > 通知铃声："notification***序号[^1]***_ring": ***输入./plugin/cw-advanced-ringtones/plugin_audio目录下的文件名（*.wav）***

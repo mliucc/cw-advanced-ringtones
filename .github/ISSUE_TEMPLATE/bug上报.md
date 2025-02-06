@@ -1,6 +1,6 @@
 ---
-name: Bug 上报
-about: 帮助我们修复bug
+name: Bug上报
+about: 帮助我们修复问题
 title: "[BUG]"
 labels: bug
 assignees: ''

@@ -1,5 +1,5 @@
 {
-  "version": "1.1.3-b2",
+  "version": "1.1.3-b3",
   "volume": "75",
   "noon_cfg": {
     "noon_switch": "0",
@@ -41,12 +41,14 @@
     "notification_quanlity": "0",
     "notification1_cfg": {
       "notification1_switch": "0",
-      "notification1_ring": "ringtone1",
+      "notification1_ring": "ringtone1.wav",
       "notification1_state": "None",
+      "notification1_duration": "None",
       "notification1_time": "None",
       "notification1_lesson": "None",
-      "notification1_message": "None",
-      "notification1_duration": "None"
+      "notification1_title": "None",
+      "notification1_subtitle": "None",
+      "notification1_content": "None"
     }
   }
 }

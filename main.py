@@ -1,9 +1,4 @@
-#高级铃声插件v1.1.3-b2
-#1.添加自定义通知支持
-#2.修改自定义铃声配置读取逻辑
-#3.添加对于早读、午休铃声的开关
-#4.修复若干bug
-
+#高级铃声插件v1.1.3-b3
 from sys import *
 from loguru import logger
 from .ClassWidgets.base import PluginBase, PluginConfig  # 导入CW的基类
@@ -13,14 +8,12 @@ import pygame
 import os
 import conf
 
-mainconfig = conf.read_conf('Audio', 'volume')
-
 class Plugin(PluginBase):  # 插件类
     def __init__(self, cw_contexts, method):  # 初始化
         super().__init__(cw_contexts, method)  # 调用父类初始化方法
         #json配置文件装载
         default_config = {
-            "version": "1.1.3-b2",
+            "version": "1.1.3-b3",
             "volume": "75",
             "noon_cfg": {
                 "noon_switch": "0",
@@ -62,12 +55,14 @@ class Plugin(PluginBase):  # 插件类
                 "notification_quanlity": "0",
                 "notification1_cfg": {
                     "notification1_switch": "0",
-                    "notification1_ring": "ringtone1",
+                    "notification1_ring": "ringtone1.wav",
                     "notification1_state": "None",
                     "notification1_time": "None",
+                    "notification1_duration": "None",
                     "notification1_lesson": "None",
-                    "notification1_message": "None",
-                    "notification1_duration": "None"
+                    "notification1_title": "None",
+                    "notification1_subtitle": "None",
+                    "notification1_content": "None"
                 }
             }
         }
@@ -83,7 +78,7 @@ class Plugin(PluginBase):  # 插件类
         global playsound,prepare_class,attend_class,finish_class,attend_school,noon,finish_school,default,noon_type,noon_class,attend_school_type,attend_school_class,vol,extring_file,extring_cfg,notifi_cfg,notification
 
         #------------------------------------------------------铃声模块-----------------------------------------------------------
-        #预设铃声文件读取
+        #预设铃声文件读取与配置
         prepare_class = self.cfg['file']['prepare_class']
         attend_class = self.cfg['file']['attend_class']
         finish_class = self.cfg['file']['finish_class']
@@ -92,9 +87,13 @@ class Plugin(PluginBase):  # 插件类
 
         if int(self.cfg['noon_cfg']['noon_switch']) == 1:
             noon = self.cfg['file']['noon']
+            noon_type = int(self.cfg['noon_cfg']['noon_type'])       #午休铃对应通知类型
+            noon_class = self.cfg['noon_cfg']['noon_class']      #午休铃对应课程
             logger.success('高级铃声插件提示：午休铃声已启用')
         if int(self.cfg['attend_school_cfg']['attend_school_switch']) == 1:
             attend_school = self.cfg['file']['attend_school']
+            attend_school_type = int(self.cfg['attend_school_cfg']['attend_school_type'])       #早读铃对应通知类型
+            attend_school_class = self.cfg['attend_school_cfg']['attend_school_class']      #早读铃对应课程
             logger.success('高级铃声插件提示：早读铃声已启用')
         
         #自定义铃声文件读取与配置
@@ -103,14 +102,11 @@ class Plugin(PluginBase):  # 插件类
         if int(self.cfg['extra_ringtones']['ringtone_quanlity']) > 0:
             for i in range(int(self.cfg['extra_ringtones']['ringtone_quanlity'])):
                 i = i + 1
-                extring_filename = f'extring_{i}'
-                extring_type = f'extring{i}_type'
-                extring_class = f'extring{i}_class'
                 #判定铃声是否启用，若启用则加载文件与配置
                 if int(self.cfg['extra_ringtones'][f'ringtone{i}_cfg'][f'ringtone{i}_switch']) == 1:
-                    extring_file[extring_filename] = self.cfg['extra_ringtones']['ringtone_file'][f'ringtone{i}']
-                    extring_cfg[extring_type] = int(self.cfg['extra_ringtones'][f'ringtone{i}_cfg'][f'ringtone{i}_type'])
-                    extring_cfg[extring_class] = self.cfg['extra_ringtones'][f'ringtone{i}_cfg'][f'ringtone{i}_class']
+                    extring_file[f'extring_{i}'] = self.cfg['extra_ringtones']['ringtone_file'][f'ringtone{i}']
+                    extring_cfg[f'extring{i}_type'] = int(self.cfg['extra_ringtones'][f'ringtone{i}_cfg'][f'ringtone{i}_type'])
+                    extring_cfg[f'extring{i}_class'] = self.cfg['extra_ringtones'][f'ringtone{i}_cfg'][f'ringtone{i}_class']
                     logger.success(f'高级铃声插件提示：自定义铃声{i}已启用')
                 else:
                     logger.error(f'高级铃声插件提示：自定义铃声{i}已禁用')
@@ -119,12 +115,6 @@ class Plugin(PluginBase):  # 插件类
             logger.info('高级铃声插件提示：当前未启用自定义铃声模块')
         else: 
             logger.error('高级铃声插件提示：自定义铃声数量错误，请检查config.json中ringtone_quanlity数字是否为正整数')
-
-        #预设铃声配置
-        noon_type = int(self.cfg['noon_cfg']['noon_type'])       #午休铃对应通知类型
-        noon_class = self.cfg['noon_cfg']['noon_class']      #午休铃对应课程
-        attend_school_type = int(self.cfg['attend_school_cfg']['attend_school_type'])       #早读铃对应通知类型
-        attend_school_class = self.cfg['attend_school_cfg']['attend_school_class']      #早读铃对应课程
 
         vol = int(self.cfg['volume'])    #铃声音量
 
@@ -147,22 +137,15 @@ class Plugin(PluginBase):  # 插件类
         if int(self.cfg['notifications']['notification_quanlity']) > 0:
             for i in range(int(self.cfg['notifications']['notification_quanlity'])):
                 i = i + 1
-                notifi_ring = f'notifi{i}_ring'
-                notifi_state = f'notifi{i}_state'
-                notifi_time = f'notifi{i}_time'
-                notifi_lesson = f'notifi{i}_lesson'
-                notifi_message = f'notifi{i}_message'
-                notifi_duration = f'notifi{i}_duration'
-
                 #判定通知是否启用，若启用则加载配置
                 if int(self.cfg['notifications'][f'notification{i}_cfg'][f'notification{i}_switch']) == 1:
-                    notifi_cfg[notifi_ring] = self.cfg['notifications'][f'notification{i}_cfg'][f'notification{i}_ring']
-                    notifi_cfg[notifi_state] = self.cfg['notifications'][f'notification{i}_cfg'][f'notification{i}_state']
-                    notifi_cfg[notifi_time] = self.cfg['notifications'][f'notification{i}_cfg'][f'notification{i}_time']
-                    notifi_cfg[notifi_lesson] = self.cfg['notifications'][f'notification{i}_cfg'][f'notification{i}_lesson']
-                    notifi_cfg[notifi_message] = self.cfg['notifications'][f'notification{i}_cfg'][f'notification{i}_message']
-                    notifi_cfg[notifi_duration] = self.cfg['notifications'][f'notification{i}_cfg'][f'notification{i}_duration']
-                    logger.success(f'高级铃声插件提示：通知{i}已启用，将在' + notifi_cfg[notifi_time] + '时通知，类型序号为' + notifi_cfg[notifi_state] + '，内容为' + notifi_cfg[notifi_message] + '，持续时长为' + notifi_cfg[notifi_duration] + ' ms ，铃声为' + notifi_cfg[notifi_ring])
+                    notifi_cfg[f'notifi{i}_ring'] = self.cfg['notifications'][f'notification{i}_cfg'][f'notification{i}_ring']
+                    notifi_cfg[f'notifi{i}_state'] = self.cfg['notifications'][f'notification{i}_cfg'][f'notification{i}_state']
+                    notifi_cfg[f'notifi{i}_time'] = self.cfg['notifications'][f'notification{i}_cfg'][f'notification{i}_time']
+                    notifi_cfg[f'notifi{i}_lesson'] = self.cfg['notifications'][f'notification{i}_cfg'][f'notification{i}_lesson']
+                    notifi_cfg[f'notifi{i}_content'] = self.cfg['notifications'][f'notification{i}_cfg'][f'notification{i}_content']
+                    notifi_cfg[f'notifi{i}_duration'] = self.cfg['notifications'][f'notification{i}_cfg'][f'notification{i}_duration']
+                    logger.success(f'高级铃声插件提示：通知{i}已启用，将在' + notifi_cfg[f'notifi{i}_time'] + '时通知，类型序号为' + notifi_cfg[f'notifi{i}_state'] + '，持续时长为' + notifi_cfg[f'notifi{i}_duration'] + ' ms ，铃声为' + notifi_cfg[f'notifi_ring'])
                 else:
                     logger.info(f'高级铃声插件提示：通知{i}已禁用')
             logger.info('高级铃声插件提示：当前共启用' + self.cfg['notifications']['notification_quanlity'] + '个通知，请确认该数量与实际启用通知数量（即config.json中notifications中notifi_quanlity数字与各notifi_cfg中notifi_switch值为1的数量）一致')
@@ -192,7 +175,7 @@ class Plugin(PluginBase):  # 插件类
                         logger.error(f'高级铃声插件播放自定义铃声{i}出错：{e}')
                     i = i + 1
                 
-            #预设铃声(急需重构的shit山)
+            #预设铃声
             if not custom_ringtone_played:
                 if self.cw_contexts['Notification']['state'] == 2:    #判定放学
                     try:
@@ -200,32 +183,32 @@ class Plugin(PluginBase):  # 插件类
                         logger.info('插件cw-advanced-ringtones播放铃声：放学')
                     except Exception as e:
                         logger.error(f'插件cw-advanced-ringtones播放 放学 铃声出错：{e}')
-                elif self.cw_contexts['Notification']['state'] == attend_school_type and self.cw_contexts['Notification']['lesson_name'] == attend_school_class:    #判定早读
+                elif self.cw_contexts['Notification']['state'] == attend_school_type and self.cw_contexts['Notification']['lesson_name'] == attend_school_class and int(self.cfg['attend_school_cfg']['attend_school_switch']) == 1:    #判定早读
                     try:
                         playsound(attend_school)
                         logger.info('插件cw-advanced-ringtones播放铃声：早读')
                     except Exception as e:
                         logger.error(f'插件cw-advanced-ringtones播放 早读 铃声出错：{e}')
-                elif self.cw_contexts['Notification']['state'] == noon_type and self.cw_contexts['Notification']['lesson_name'] == noon_class:    #判定午休
+                elif self.cw_contexts['Notification']['state'] == noon_type and self.cw_contexts['Notification']['lesson_name'] == noon_class and int(self.cfg['noon_cfg']['noon_switch']) == 1:    #判定午休
                     try:
                         playsound(noon)
                         logger.info('插件cw-advanced-ringtones播放铃声：午休')
                     except Exception as e:
                         logger.error(f'插件cw-advanced-ringtones播放 午休 铃声出错：{e}')
                 else:    #判定普通铃声
-                    if self.cw_contexts['Notification']['state'] == 0:    #判定下课
+                    if self.cw_contexts['Notification']['state'] == 0 and conf.read_conf('Toast', 'finish_class') == 1:    #判定下课
                         try:
                             playsound(finish_class)
                             logger.info('插件cw-advanced-ringtones播放铃声：下课')
                         except Exception as e:
                             logger.error(f'插件cw-advanced-ringtones播放 下课 铃声出错：{e}')
-                    elif self.cw_contexts['Notification']['state'] == 1:    #判定上课
+                    elif self.cw_contexts['Notification']['state'] == 1 and conf.read_conf('Toast', 'attend_class') == 1:    #判定上课
                         try:
                             playsound(attend_class)
                             logger.info('插件cw-advanced-ringtones播放铃声：上课')
                         except Exception as e:
                             logger.error(f'插件cw-advanced-ringtones播放 上课 铃声出错：{e}')
-                    elif self.cw_contexts['Notification']['state'] == 3:    #判定预备
+                    elif self.cw_contexts['Notification']['state'] == 3 and conf.read_conf('Toast', 'prepare_class') == 1:    #判定预备
                         try:
                             playsound(prepare_class)
                             logger.info('插件cw-advanced-ringtones播放铃声：准备上课')
@@ -256,15 +239,10 @@ class Plugin(PluginBase):  # 插件类
                         self.method.send_notification(
                             state=int(notifi_cfg[f'notifi{i}_state']),
                             title='高级铃声插件通知',
-                            content=notifi_cfg[f'notifi{i}_message'],
+                            content=notifi_cfg[f'notifi{i}_content'],
                             duration=int(notifi_cfg[f'notifi{i}_duration']) 
                         )
-                    elif int(notifi_cfg[f'notifi{i}_state']) == 3:
-                        self.method.send_notification(
-                            state=int(notifi_cfg[f'notifi{i}_state']),
-                            duration=int(notifi_cfg[f'notifi{i}_duration']), 
-                        )
-                    else:
+                    elif int(notifi_cfg[f'notifi{i}_state']) == 0 or int(notifi_cfg[f'notifi{i}_state']) == 1 or int(notifi_cfg[f'notifi{i}_state']) == 3:
                         self.method.send_notification(
                             state=int(notifi_cfg[f'notifi{i}_state']),
                             lesson_name = notifi_cfg[f'notifi{i}_lesson'],
@@ -272,9 +250,10 @@ class Plugin(PluginBase):  # 插件类
                         )
                     self.notified_times.add(current_time)
                     playsound(notifi_cfg[f'notifi{i}_ring'])
-                    logger.info(f'高级铃声插件发送通知：{notifi_cfg[f"notifi{i}_message"]}')
+                    logger.info(f'高级铃声插件发送通知{i}')
         except NameError:
             pass
         except Exception as e:
                 logger.error(f'高级铃声插件发送通知出错：{e}')        
+
 

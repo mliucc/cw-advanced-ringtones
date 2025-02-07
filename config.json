@@ -21,7 +21,6 @@
     "default": "default.wav"
   },
   "extra_ringtones": {
-    "ringtone_quanlity": "0",
     "ringtone_file": {
       "ringtone1": "ringtone1.wav",
       "ringtone2": "ringtone2.wav"
@@ -38,7 +37,6 @@
     }
   },
   "notifications": {
-    "notification_quanlity": "0",
     "notification1_cfg": {
       "notification1_switch": "0",
       "notification1_ring": "ringtone1.wav",

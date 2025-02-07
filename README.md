@@ -34,7 +34,7 @@
 - **配置通知**  进入./plugin/cw-advanced-ringtones目录，打开**config.json的"notifications"模块**，按照下面提示进行配置： 
    > 通知开关："notification***序号[^1]***_switch": ***0或1, 0为关闭通知，1为开启通知***
    > 
-   > 通知铃声："notification***序号[^1]***_ring": ***输入./plugin/cw-advanced-ringtones/plugin_audio目录下的文件名（*.wav）***
+   > 通知铃声："notification***序号[^1]***_ring": ***输入./plugin/cw-advanced-ringtones/plugin_audio目录下的文件名（\*.wav）***
    > 
    > 通知类别："notification***序号[^1]***_state": ***0或1或3或4，0为下课铃，1为上课铃，3为预备铃，4为其他通知***
    > 

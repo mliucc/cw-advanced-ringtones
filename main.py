@@ -75,7 +75,6 @@ class Plugin(PluginBase):  # 插件类
         self.current_date = datetime.now().date()  # 记录当前日期
 
     def execute(self):  # 自启动执行部分
-        
         global is_latest_version
         plugin_version = default_config['version']
         config_version = self.cfg['version']
@@ -113,14 +112,16 @@ class Plugin(PluginBase):  # 插件类
             extring_cfg = {}
             ringtone_enabled_quanlity = 0
             ringtone_quanlity = 0
+            #读取自定义铃声数量
             for key, value in self.cfg['extra_ringtones'].items():
                 if "cfg" in key:
                     ringtone_quanlity += 1
+            #读取启用自定义铃声数量
             for j in range(ringtone_quanlity):
                 j=  j + 1
                 if int(self.cfg['extra_ringtones'][f'ringtone{j}_cfg'][f'ringtone{j}_switch']) == 1:
                     ringtone_enabled_quanlity += 1
-            if ringtone_quanlity > 0:
+            if ringtone_enabled_quanlity > 0:
                 for i in range(ringtone_quanlity):
                     i = i + 1
                     #判定铃声是否启用，若启用则加载文件与配置
@@ -132,7 +133,7 @@ class Plugin(PluginBase):  # 插件类
                     else:
                         logger.info(f'高级铃声插件提示：自定义铃声{i}已禁用.')
                 logger.info('高级铃声插件提示：当前共启用' + str(ringtone_enabled_quanlity) + '个自定义铃声.')
-            elif ringtone_quanlity == 0:
+            elif ringtone_enabled_quanlity == 0:
                 logger.info('高级铃声插件提示：当前未启用自定义铃声模块.')
             vol = int(self.cfg['volume'])    #铃声音量
 
@@ -154,9 +155,11 @@ class Plugin(PluginBase):  # 插件类
             notifi_cfg = {}
             notifi_enabled_quanlity = 0
             notifi_quanlity = 0
+            #读取通知数量
             for key, value in self.cfg['notifications'].items():
                 if "cfg" in key:
                     notifi_quanlity += 1
+            #读取启用通知数量
             for j in range(notifi_quanlity):
                 j =  j + 1
                 if int(self.cfg['notifications'][f'notification{j}_cfg'][f'notification{j}_switch']) == 1:
@@ -266,10 +269,14 @@ class Plugin(PluginBase):  # 插件类
                             i = i + 1
                             if int(self.cfg['notifications'][f'notification{i}_cfg'][f'notification{i}_switch']) == 1:
                                 if current_time == notifi_cfg[f'notifi{i}_time'] and current_time not in self.notified_times:
+                                    if notifi_cfg[f'notifi{i}_lesson'] == 'None' and len(self.cw_contexts['Next_Lessons']) > 0:
+                                        notifi_cfg[f'notifi{i}_lesson'] = self.cw_contexts['Next_Lessons'][0]
+                                    else:
+                                        pass
                                     if int(notifi_cfg[f'notifi{i}_state']) == 4: 
                                         self.method.send_notification(
                                             state = int(notifi_cfg[f'notifi{i}_state']),
-                                            title = '高级铃声插件通知',
+                                            title = notifi_cfg[f'notifi{i}_title'],
                                             subtitle = notifi_cfg[f'notifi{i}_subtitle'],
                                             content = notifi_cfg[f'notifi{i}_content'],
                                             duration = int(notifi_cfg[f'notifi{i}_duration']) 
@@ -287,6 +294,9 @@ class Plugin(PluginBase):  # 插件类
                     pass
                 except Exception as e:
                     logger.error(f'高级铃声插件发送通知出错：{e}.')        
-        except NameError:
-            pass
+        except NameError as i:
+            if 'is_latest_version' in i:
+                pass
+            else:
+                logger.critical(i)
 

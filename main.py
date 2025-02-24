@@ -1,4 +1,4 @@
-#高级铃声插件v1.1.3-b4
+#高级铃声插件v1.1.3
 from sys import *
 from loguru import logger
 from .ClassWidgets.base import PluginBase, PluginConfig  # 导入CW的基类
@@ -14,7 +14,7 @@ class Plugin(PluginBase):  # 插件类
         global default_config
         #json配置文件装载
         default_config = {
-            "version": "1.1.3-b4",
+            "version": "1.1.3",
             "volume": "75",
             "noon_cfg": {
                 "noon_switch": "0",
@@ -76,8 +76,9 @@ class Plugin(PluginBase):  # 插件类
 
     def execute(self):  # 自启动执行部分
         global is_latest_version
-        plugin_version = default_config['version']
-        config_version = self.cfg['version']
+        #版本校验
+        plugin_version = default_config['version']   #插件版本
+        config_version = self.cfg['version']   #配置文件版本
         if plugin_version == config_version:
             is_latest_version = True
             logger.success('高级铃声插件 版本校验完成.')
@@ -295,7 +296,7 @@ class Plugin(PluginBase):  # 插件类
                 except Exception as e:
                     logger.error(f'高级铃声插件发送通知出错：{e}.')        
         except NameError as i:
-            if 'is_latest_version' in i:
+            if 'is_latest_version' in str(i):
                 pass
             else:
                 logger.critical(i)
